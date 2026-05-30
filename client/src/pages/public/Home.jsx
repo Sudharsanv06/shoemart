@@ -14,9 +14,9 @@ export default function Home() {
 
   const brands = ["Nike", "Adidas", "Puma", "Reebok", "Skechers", "Woodland"];
   const categories = [
-    { name: "Men's", gender: "MEN", image: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg" },
-    { name: "Women's", gender: "WOMEN", image: "https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg" },
-    { name: "Kids", gender: "KIDS", image: "https://fakestoreapi.com/img/61mtL65D4cL._AC_SX679_.jpg" },
+    { name: "Men's", gender: "MEN", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80" },
+    { name: "Women's", gender: "WOMEN", image: "https://images.unsplash.com/photo-1535043934128-cf0b28d52f95?w=600&q=80" },
+    { name: "Kids", gender: "KIDS", image: "https://images.unsplash.com/photo-1555274175-6cbf6f3b137b?w=600&q=80" },
   ];
 
   const sportTypes = [
@@ -51,7 +51,7 @@ export default function Home() {
       <section className="relative h-screen bg-gradient-to-br from-charcoal to-obsidian flex items-center overflow-hidden">
         <div className="absolute right-0 top-0 w-1/2 h-full opacity-30">
           <img
-            src="https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"
+            src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80"
             alt="Hero Shoe"
             className="w-full h-full object-cover"
           />
