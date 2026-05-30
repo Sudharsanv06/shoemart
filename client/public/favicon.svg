@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Shoemart">
+  <rect width="100" height="100" rx="24" fill="#0d0d0d"/>
+  <path d="M30 26h40l9 18-9 30c-4 8-11 14-20 14s-16-6-20-14l-9-30 9-18z" fill="#f5f1e8"/>
+  <path d="M36 43h28" stroke="#0d0d0d" stroke-width="6" stroke-linecap="round"/>
+  <path d="M39 55h22" stroke="#0d0d0d" stroke-width="6" stroke-linecap="round"/>
+</svg>
