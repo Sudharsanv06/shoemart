@@ -135,7 +135,8 @@ export default function ProductDetail() {
                 alt={product.name}
                 crossOrigin="anonymous"
                 onError={(e) => {
-                  e.target.src = FALLBACK_IMAGE;
+                  e.target.onerror = null;
+                  e.target.src = "https://placehold.co/600x600/1A1A1A/C9A84C?text=SHOEMART";
                 }}
                 className="w-full h-full object-cover"
               />
@@ -155,7 +156,8 @@ export default function ProductDetail() {
                       alt={`${product.name} ${i}`}
                       crossOrigin="anonymous"
                       onError={(e) => {
-                        e.target.src = FALLBACK_IMAGE;
+                        e.target.onerror = null;
+                        e.target.src = "https://placehold.co/600x600/1A1A1A/C9A84C?text=SHOEMART";
                       }}
                       className="w-full h-full object-cover"
                     />

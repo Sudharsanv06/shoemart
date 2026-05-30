@@ -14,9 +14,9 @@ export default function Home() {
 
   const brands = ["Nike", "Adidas", "Puma", "Reebok", "Skechers", "Woodland"];
   const categories = [
-    { name: "Men's", gender: "MEN", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80" },
-    { name: "Women's", gender: "WOMEN", image: "https://images.unsplash.com/photo-1535043934128-cf0b28d52f95?w=600&q=80" },
-    { name: "Kids", gender: "KIDS", image: "https://images.unsplash.com/photo-1555274175-6cbf6f3b137b?w=600&q=80" },
+    { name: "Men's", gender: "MEN", image: "https://i.imgur.com/2nCt3Sbl.jpg" },
+    { name: "Women's", gender: "WOMEN", image: "https://i.imgur.com/1P4EIcm.jpg" },
+    { name: "Kids", gender: "KIDS", image: "https://i.imgur.com/eBlfNkp.jpg" },
   ];
 
   const sportTypes = [

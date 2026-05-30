@@ -112,7 +112,8 @@ export default function ProductCard({ product }) {
           alt={product.name}
           crossOrigin="anonymous"
           onError={(e) => {
-            e.target.src = "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
+            e.target.onerror = null;
+            e.target.src = "https://placehold.co/600x600/1A1A1A/C9A84C?text=SHOEMART";
           }}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />
@@ -246,7 +247,8 @@ export default function ProductCard({ product }) {
               alt={product.name}
               crossOrigin="anonymous"
               onError={(e) => {
-                e.target.src = "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
+                e.target.onerror = null;
+                e.target.src = "https://placehold.co/600x600/1A1A1A/C9A84C?text=SHOEMART";
               }}
               className="w-full h-56 object-cover mb-4"
             />
