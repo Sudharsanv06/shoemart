@@ -28,7 +28,7 @@ export default function About() {
           </div>
           <div className="bg-charcoal h-96 rounded-lg overflow-hidden">
             <img
-              src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=400&fit=crop"
+              src="https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"
               alt="About"
               className="w-full h-full object-cover"
             />

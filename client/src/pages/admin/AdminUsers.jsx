@@ -3,7 +3,7 @@ import AdminSidebar from "../../components/admin/AdminSidebar";
 import { adminAPI } from "../../api";
 import toast from "react-hot-toast";
 
-const FALLBACK_AVATAR = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300";
+const FALLBACK_AVATAR = "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);

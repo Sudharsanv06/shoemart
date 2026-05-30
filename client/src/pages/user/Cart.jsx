@@ -7,10 +7,10 @@ import { Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
 
 const getImage = (images) => {
-  if (!images) return "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300";
-  if (Array.isArray(images)) return images[0] || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300";
-  if (typeof images === "string") return images.split(",")[0].trim() || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300";
-  return "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300";
+  if (!images) return "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
+  if (Array.isArray(images)) return images[0] || "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
+  if (typeof images === "string") return images.split(",")[0].trim() || "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
+  return "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
 };
 
 export default function Cart() {
@@ -96,8 +96,9 @@ export default function Cart() {
                   <img
                     src={getImage(getItemProduct(item).images)}
                     alt={getItemProduct(item).name || "Cart item"}
+                    crossOrigin="anonymous"
                     onError={(e) => {
-                      e.target.src = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300";
+                      e.target.src = "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
                     }}
                     className="w-full h-full object-cover"
                   />

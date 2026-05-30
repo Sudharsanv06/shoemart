@@ -133,6 +133,7 @@ export default function ProductDetail() {
               <img
                 src={mainImage || getFirstImage(product.images)}
                 alt={product.name}
+                crossOrigin="anonymous"
                 onError={(e) => {
                   e.target.src = FALLBACK_IMAGE;
                 }}
@@ -152,6 +153,7 @@ export default function ProductDetail() {
                     <img
                       src={getFirstImage(img)}
                       alt={`${product.name} ${i}`}
+                      crossOrigin="anonymous"
                       onError={(e) => {
                         e.target.src = FALLBACK_IMAGE;
                       }}

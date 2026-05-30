@@ -21,7 +21,7 @@ const normalizeEnum = (value) => {
   return map[normalized] || normalized;
 };
 
-const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300";
+const FALLBACK_IMAGE = "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
 
 const brands = [
   { label: "Nike", value: "NIKE" },

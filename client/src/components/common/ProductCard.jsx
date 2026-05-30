@@ -8,7 +8,7 @@ import { Heart, Eye } from "lucide-react";
 import toast from "react-hot-toast";
 
 const getFirstImage = (images, returnAll = false) => {
-  const fallback = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300";
+  const fallback = "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
   let arr = [];
 
   if (!images) arr = [fallback];
@@ -110,8 +110,9 @@ export default function ProductCard({ product }) {
         <img
           src={activeImage}
           alt={product.name}
+          crossOrigin="anonymous"
           onError={(e) => {
-            e.target.src = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300";
+            e.target.src = "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
           }}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />
@@ -243,8 +244,9 @@ export default function ProductCard({ product }) {
             <img
               src={activeImage}
               alt={product.name}
+              crossOrigin="anonymous"
               onError={(e) => {
-                e.target.src = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300";
+                e.target.src = "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
               }}
               className="w-full h-56 object-cover mb-4"
             />
