@@ -5,6 +5,10 @@ import ProductCard from "../../components/common/ProductCard";
 import Loader from "../../components/common/Loader";
 import { ChevronRight, Truck, RotateCcw, Shield, Lock, Zap } from "lucide-react";
 import toast from "react-hot-toast";
+import mensImg from "../../assets/categories/mens.jpg";
+import womensImg from "../../assets/categories/womens.jpg";
+import kidsImg from "../../assets/categories/kids.jpg";
+import heroImg from "../../assets/products/shoes.jpg";
 
 export default function Home() {
   const [featured, setFeatured] = useState([]);
@@ -14,9 +18,9 @@ export default function Home() {
 
   const brands = ["Nike", "Adidas", "Puma", "Reebok", "Skechers", "Woodland"];
   const categories = [
-    { name: "Men's", gender: "MEN", image: "https://i.imgur.com/2nCt3Sbl.jpg" },
-    { name: "Women's", gender: "WOMEN", image: "https://i.imgur.com/1P4EIcm.jpg" },
-    { name: "Kids", gender: "KIDS", image: "https://i.imgur.com/eBlfNkp.jpg" },
+    { name: "Men's", gender: "MEN", image: mensImg },
+    { name: "Women's", gender: "WOMEN", image: womensImg },
+    { name: "Kids", gender: "KIDS", image: kidsImg },
   ];
 
   const sportTypes = [
@@ -48,15 +52,19 @@ export default function Home() {
   return (
     <div className="bg-obsidian text-ivory">
       {/* Hero Section */}
-      <section className="relative h-screen bg-gradient-to-br from-charcoal to-obsidian flex items-center overflow-hidden">
-        <div className="absolute right-0 top-0 w-1/2 h-full opacity-30">
-          <img
-            src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80"
-            alt="Hero Shoe"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="max-w-7xl mx-auto px-6 relative z-10 w-full md:w-1/2">
+      <section className="relative h-screen flex items-center overflow-hidden">
+        {/* Full Background Image */}
+        <img
+          src={heroImg}
+          alt="Hero Shoe"
+          className="absolute inset-0 w-full h-full object-cover filter brightness-50"
+        />
+
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-black/40" />
+
+        {/* Content */}
+        <div className="max-w-7xl mx-auto px-6 relative z-10 w-full md:w-1/2 md:pl-24">
           <h1 className="font-display text-6xl md:text-7xl text-ivory mb-6 leading-tight">
             Step Into <span className="text-gold">Luxury</span>
           </h1>
@@ -124,10 +132,14 @@ export default function Home() {
               to={`/category/${cat.gender.toLowerCase()}`}
               className="group relative h-96 overflow-hidden"
             >
-              <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
-                <h3 className="font-display text-3xl text-gold group-hover:text-ivory transition-colors">{cat.name}</h3>
-              </div>
+              <img
+                src={cat.image}
+                alt={cat.name}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-100"
+                style={{ filter: "brightness(100%)" }}
+              />
+              <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300" />
+              <div className="category-label">{cat.name}</div>
             </Link>
           ))}
         </div>

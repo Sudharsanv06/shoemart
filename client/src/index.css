@@ -69,3 +69,37 @@ h1, h2, h3 {
 .badge-gold {
   @apply bg-gold text-obsidian text-xs font-semibold px-2 py-0.5 rounded-full;
 }
+
+/* Category card styles (brighten images, gold label) */
+.category-card {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.category-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(95%);
+  transition: 0.3s ease;
+}
+
+.category-card:hover img {
+  filter: brightness(110%);
+  transform: scale(1.03);
+}
+
+.category-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--gold);
+  color: black;
+  padding: 10px 22px;
+  font-size: 28px;
+  font-weight: 600;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
