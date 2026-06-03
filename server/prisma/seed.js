@@ -62,8 +62,8 @@ async function main() {
         description: `Premium ${p.name} — crafted for performance and style. ${p.tags.join(", ")}.`,
         sizes: Array.isArray(p.sizes) ? p.sizes.join(",") : p.sizes,
         tags: Array.isArray(p.tags) ? p.tags.join(",") : p.tags,
-        rating: parseFloat((3.5 + Math.random() * 1.5).toFixed(1)),
-        reviewCount: Math.floor(Math.random() * 200) + 10,
+        rating: 0,
+        reviewCount: 0,
       },
     });
   }

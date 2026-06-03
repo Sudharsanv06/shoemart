@@ -100,8 +100,8 @@ export default function ProductCard({ product }) {
 
   return (
     <>
-    <Link
-      to={`/products/${product.id}`}
+    <div
+      onClick={() => navigate(`/products/${product.id}`)}
       className="group relative block bg-charcoal border border-transparent hover:border-gold transition-all duration-300 overflow-hidden cursor-pointer"
       onMouseEnter={startHoverCycle}
       onMouseLeave={stopHoverCycle}
@@ -312,7 +312,7 @@ export default function ProductCard({ product }) {
           </div>
         </div>
       )}
-    </Link>
+    </div>
     </>
   );
 }

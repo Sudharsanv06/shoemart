@@ -2,25 +2,38 @@ const prisma = require("../config/db");
 const ApiResponse = require("../utils/ApiResponse");
 const ApiError = require("../utils/ApiError");
 
+// Shared helper — always recalculates from scratch
+const recalculateProductRating = async (productId) => {
+  const all = await prisma.review.findMany({ where: { productId } });
+  const avg = all.length > 0
+    ? all.reduce((sum, r) => sum + r.rating, 0) / all.length
+    : 0;
+  await prisma.product.update({
+    where: { id: productId },
+    data: {
+      rating:      parseFloat(avg.toFixed(1)),
+      reviewCount: all.length,
+    },
+  });
+  return { avg: parseFloat(avg.toFixed(1)), count: all.length };
+};
+
 // Get all reviews for a product
 exports.getProductReviews = async (req, res, next) => {
   try {
     const reviews = await prisma.review.findMany({
-      where: { productId: req.params.productId },
-      include: {
-        user: { select: { id: true, name: true, avatar: true } }
-      },
+      where:   { productId: req.params.productId },
+      include: { user: { select: { id: true, name: true, avatar: true } } },
       orderBy: { createdAt: "desc" },
     });
 
-    // Calculate average rating
-    const avgRating = reviews.length
+    const avg = reviews.length > 0
       ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
       : 0;
 
     res.json(new ApiResponse(200, {
       reviews,
-      avgRating: parseFloat(avgRating.toFixed(1)),
+      avgRating:    parseFloat(avg.toFixed(1)),
       totalReviews: reviews.length,
     }));
   } catch (e) { next(e); }
@@ -37,33 +50,23 @@ exports.addReview = async (req, res, next) => {
     if (rating < 1 || rating > 5)
       throw new ApiError(400, "Rating must be between 1 and 5");
 
-    // Check user purchased this product
-    const purchased = await prisma.orderItem.findFirst({
-      where: {
-        productId,
-        order: { userId: req.user.id, status: { in: ["DELIVERED", "CONFIRMED"] } }
-      }
+    // Upsert — one review per user per product
+    await prisma.review.upsert({
+      where:  { userId_productId: { userId: req.user.id, productId } },
+      update: { rating: parseInt(rating), title, body },
+      create: { rating: parseInt(rating), title, body, userId: req.user.id, productId },
     });
 
-    const review = await prisma.review.upsert({
-      where: { userId_productId: { userId: req.user.id, productId } },
-      update: { rating, title, body },
-      create: { rating, title, body, userId: req.user.id, productId },
-      include: { user: { select: { id: true, name: true, avatar: true } } }
+    // ALWAYS recalculate from ALL reviews for this product
+    await recalculateProductRating(productId);
+
+    // Return fresh review with user
+    const review = await prisma.review.findUnique({
+      where:   { userId_productId: { userId: req.user.id, productId } },
+      include: { user: { select: { id: true, name: true, avatar: true } } },
     });
 
-    // Update product average rating
-    const allReviews = await prisma.review.findMany({ where: { productId } });
-    const avg = allReviews.reduce((s, r) => s + r.rating, 0) / allReviews.length;
-    await prisma.product.update({
-      where: { id: productId },
-      data: {
-        rating:      parseFloat(avg.toFixed(1)),
-        reviewCount: allReviews.length,
-      }
-    });
-
-    res.status(201).json(new ApiResponse(201, review, "Review added successfully"));
+    res.status(201).json(new ApiResponse(201, review, "Review submitted"));
   } catch (e) { next(e); }
 };
 
@@ -76,17 +79,11 @@ exports.deleteReview = async (req, res, next) => {
     if (review.userId !== req.user.id && req.user.role !== "ADMIN")
       throw new ApiError(403, "Not authorized");
 
+    const { productId } = review;
     await prisma.review.delete({ where: { id: req.params.id } });
 
-    // Recalculate product rating
-    const remaining = await prisma.review.findMany({ where: { productId: review.productId } });
-    const avg = remaining.length
-      ? remaining.reduce((s, r) => s + r.rating, 0) / remaining.length
-      : 0;
-    await prisma.product.update({
-      where: { id: review.productId },
-      data: { rating: parseFloat(avg.toFixed(1)), reviewCount: remaining.length }
-    });
+    // Recalculate after delete
+    await recalculateProductRating(productId);
 
     res.json(new ApiResponse(200, null, "Review deleted"));
   } catch (e) { next(e); }

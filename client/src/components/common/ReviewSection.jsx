@@ -28,23 +28,24 @@ export default function ReviewSection({ productId, onReviewUpdate }) {
 
   const handleSubmit = async () => {
     if (!user) { navigate("/login"); return; }
-    if (form.rating === 0) { toast.error("Please select a rating"); return; }
-    if (!form.title.trim()) { toast.error("Please add a title"); return; }
-    if (!form.body.trim())  { toast.error("Please write your review"); return; }
+    if (form.rating === 0) { toast.error("Select a star rating"); return; }
+    if (!form.title.trim()) { toast.error("Add a title"); return; }
+    if (!form.body.trim())  { toast.error("Write your review"); return; }
     try {
       setSubmitting(true);
       await reviewAPI.add(productId, form);
       toast.success("Review submitted!");
       setForm({ rating: 0, title: "", body: "" });
       setShowForm(false);
-      await loadReviews();
-      onReviewUpdate?.();
+      await loadReviews();       // refresh review list + avg
+      onReviewUpdate?.();        // refresh product card rating
     } catch (e) {
-      toast.error(e.response?.data?.message || "Failed to submit review");
+      toast.error(e.response?.data?.message || "Failed to submit");
     } finally { setSubmitting(false); }
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm("Delete this review?")) return;
     try {
       await reviewAPI.delete(id);
       toast.success("Review deleted");

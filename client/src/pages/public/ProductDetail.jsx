@@ -26,6 +26,7 @@ const toImageList = (images) => {
   if (typeof images === "string") return images.split(",").map((image) => image.trim()).filter(Boolean);
   return [FALLBACK_IMAGE];
 };
+const parseProduct = (p) => p;
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -39,6 +40,7 @@ export default function ProductDetail() {
   const [mainImage, setMainImage] = useState("");
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [activeTab, setActiveTab] = useState("description");
   const [addingToCart, setAddingToCart] = useState(false);
   const [addingToWishlist, setAddingToWishlist] = useState(false);
@@ -71,8 +73,11 @@ export default function ProductDetail() {
     fetchProduct();
   }, [id]);
 
-  const handleReviewUpdate = () => {
-    fetchProduct();
+  const handleReviewUpdate = async () => {
+    try {
+      const res = await productAPI.getOne(id);
+      setProduct(parseProduct(res.data.data));
+    } catch (e) { console.error(e); }
   };
 
   useEffect(() => {
@@ -217,19 +222,21 @@ export default function ProductDetail() {
                 <p className="font-semibold mb-3">
                   Size: {selectedSize ? `UK ${selectedSize}` : "Not selected"}
                 </p>
-                <div className="grid grid-cols-4 gap-3">
+                <div className="flex flex-wrap gap-2 mt-3">
                   {sizes.map((size) => (
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
                       disabled={outOfStock}
-                      className={`w-12 h-12 rounded text-sm font-body border transition-all duration-200 cursor-pointer ${
-                        outOfStock
+                      className={`
+                        w-12 h-12 text-sm font-medium border transition-all duration-200
+                        ${outOfStock
                           ? "border-white/10 text-ivory/30 cursor-not-allowed"
                           : selectedSize === size
-                          ? "bg-gold text-obsidian border-gold font-bold scale-105"
-                          : "bg-transparent text-ivory border-ivory/30 hover:border-gold hover:text-gold"
-                      }`}
+                          ? "border-gold bg-gold text-obsidian"
+                          : "border-white/20 text-ivory hover:border-gold hover:text-gold"
+                        }
+                      `}
                     >
                       {size}
                     </button>

@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import Navbar         from "./components/common/Navbar";
 import Footer         from "./components/common/Footer";
 import ProtectedRoute from "./components/common/ProtectedRoute";
+import ScrollToTop    from "./components/common/ScrollToTop";
 
 // Public
 import Home          from "./pages/public/Home";
@@ -38,6 +39,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-obsidian text-ivory font-body">
+      <ScrollToTop />
       <Routes>
         {/* Admin routes — own layout, no Navbar/Footer */}
         <Route path="/admin/*" element={
