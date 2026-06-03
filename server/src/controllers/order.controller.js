@@ -1,6 +1,10 @@
 const prisma      = require("../config/db");
 const ApiResponse = require("../utils/ApiResponse");
 const ApiError    = require("../utils/ApiError");
+const sendEmail = require("../utils/sendEmail");
+const emailTemplates = require("../utils/emailTemplates");
+
+
 
 const toArr = (val) => {
   if (!val) return [];
@@ -71,6 +75,19 @@ exports.createOrder = async (req, res, next) => {
 
     // Clear cart after order
     await prisma.cartItem.deleteMany({ where: { userId: req.user.id } });
+
+    // Send order confirmation email (non-blocking)
+    try {
+      const fullOrder = await prisma.order.findUnique({
+        where:   { id: order.id },
+        include: { items: { include: { product: true } }, address: true },
+      });
+      const emailData = emailTemplates.orderConfirmationEmail(req.user, fullOrder);
+      sendEmail({ to: req.user.email, ...emailData });
+    } catch (emailErr) {
+      console.error("Email send failed:", emailErr.message);
+      // Order already created — just log, don't fail
+    }
 
     const mapped = { ...order, razorpayPaymentId: order.stripePaymentId };
     res.status(201).json(new ApiResponse(201, mapped, "Order placed"));
@@ -165,6 +182,22 @@ exports.updateOrderStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
     const order = await prisma.order.update({ where: { id: req.params.id }, data: { status } });
+
+    // Send status update email
+    try {
+      const fullOrder = await prisma.order.findUnique({
+        where:   { id: req.params.id },
+        include: {
+          items:   { include: { product: true } },
+          user:    true,
+        },
+      });
+      const emailData = emailTemplates.orderStatusEmail(fullOrder.user, fullOrder);
+      sendEmail({ to: fullOrder.user.email, ...emailData });
+    } catch (emailErr) {
+      console.error("Email send failed:", emailErr.message);
+    }
+
     res.json(new ApiResponse(200, order, "Status updated"));
   } catch (e) { next(e); }
 };
