@@ -105,4 +105,12 @@ export const adminAPI = {
   deleteUser: (id) => api.delete(`/admin/users/${id}`),
 };
 
+// REVIEWS
+export const reviewAPI = {
+  getByProduct: (productId) => api.get(`/reviews/${productId}`),
+  add:          (productId, data) => api.post(`/reviews/${productId}`, data),
+  delete:       (id)         => api.delete(`/reviews/${id}`),
+  adminGetAll:  ()           => api.get("/reviews/admin/all"),
+};
+
 export default api;

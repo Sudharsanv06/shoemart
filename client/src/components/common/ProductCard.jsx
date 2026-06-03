@@ -6,6 +6,7 @@ import { setCart } from "../../store/cartSlice";
 import { setWishlist } from "../../store/wishlistSlice";
 import { Heart, Eye } from "lucide-react";
 import toast from "react-hot-toast";
+import StarRating from "./StarRating";
 
 const getFirstImage = (images, returnAll = false) => {
   const fallback = "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
@@ -178,6 +179,12 @@ export default function ProductCard({ product }) {
         <h3 className="font-display text-lg text-ivory line-clamp-2 hover:text-gold transition-colors cursor-pointer">
           {product.name}
         </h3>
+
+        {/* Rating */}
+        <div className="flex items-center gap-1 mt-1">
+          <StarRating rating={product.rating || 0} size="sm" />
+          <span className="text-muted text-xs">({product.reviewCount || 0})</span>
+        </div>
 
         {/* Sizes */}
         {sizes.length > 0 && (

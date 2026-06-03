@@ -6,6 +6,8 @@ import { setCart } from "../../store/cartSlice";
 import { setWishlist } from "../../store/wishlistSlice";
 import ProductCard from "../../components/common/ProductCard";
 import Loader from "../../components/common/Loader";
+import ReviewSection from "../../components/common/ReviewSection";
+import StarRating from "../../components/common/StarRating";
 import { Heart, Star, ChevronUp, ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -48,25 +50,30 @@ export default function ProductDetail() {
   const imageList = toImageList(product?.images);
   const outOfStock = Number(product?.stock) === 0;
 
+  const fetchProduct = async () => {
+    try {
+      const res = await productAPI.getOne(id);
+      const prod = res.data.data;
+      setProduct(prod);
+      setMainImage(getFirstImage(prod.images));
+      
+      // Fetch related products (same brand)
+      const relatedRes = await productAPI.getAll({ brand: prod.brand });
+      setRelated(relatedRes.data.data.products?.filter(p => p.id !== id).slice(0, 4) || []);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to load product");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const res = await productAPI.getOne(id);
-        const prod = res.data.data;
-        setProduct(prod);
-        setMainImage(getFirstImage(prod.images));
-        
-        // Fetch related products (same brand)
-        const relatedRes = await productAPI.getAll({ brand: prod.brand });
-        setRelated(relatedRes.data.data.products?.filter(p => p.id !== id).slice(0, 4) || []);
-      } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to load product");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchProduct();
   }, [id]);
+
+  const handleReviewUpdate = () => {
+    fetchProduct();
+  };
 
   useEffect(() => {
     setSelectedSize(null);
@@ -177,12 +184,9 @@ export default function ProductDetail() {
 
             {/* Rating */}
             <div className="flex items-center gap-2">
-              <div className="flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={16} className={i < 4 ? "fill-gold text-gold" : "text-white/20"} />
-                ))}
-              </div>
-              <span className="text-ivory/60">(124 reviews)</span>
+              <StarRating rating={product.rating || 0} size="md" />
+              <span className="text-gold font-semibold">{product.rating || 0}</span>
+              <span className="text-muted text-sm">({product.reviewCount || 0} {product.reviewCount === 1 ? "review" : "reviews"})</span>
             </div>
 
             {/* Price */}
@@ -333,6 +337,9 @@ export default function ProductDetail() {
             </div>
           </section>
         )}
+
+        {/* Reviews Section */}
+        <ReviewSection productId={product.id} onReviewUpdate={handleReviewUpdate} />
       </div>
     </div>
   );

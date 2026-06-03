@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FiGrid, FiBox, FiShoppingBag, FiUsers, FiLogOut } from "react-icons/fi";
+import { FiGrid, FiBox, FiShoppingBag, FiUsers, FiStar, FiLogOut } from "react-icons/fi";
 import { logout } from "../../store/authSlice";
 
 const navItems = [
@@ -8,6 +8,7 @@ const navItems = [
   { label: "Products", icon: FiBox, path: "/admin/products" },
   { label: "Orders", icon: FiShoppingBag, path: "/admin/orders" },
   { label: "Users", icon: FiUsers, path: "/admin/users" },
+  { label: "Reviews", icon: FiStar, path: "/admin/reviews" },
 ];
 
 export default function AdminSidebar() {

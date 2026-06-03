@@ -30,6 +30,7 @@ import AdminEditProduct from "./pages/admin/AdminEditProduct";
 import AdminOrders     from "./pages/admin/AdminOrders";
 import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
 import AdminUsers      from "./pages/admin/AdminUsers";
+import AdminReviews    from "./pages/admin/AdminReviews";
 import NotFound        from "./pages/NotFound";
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
               <Route path="orders"       element={<AdminOrders />} />
               <Route path="orders/:id"   element={<AdminOrderDetail />} />
               <Route path="users"        element={<AdminUsers />} />
+              <Route path="reviews"      element={<AdminReviews />} />
             </Routes>
           </ProtectedRoute>
         } />
