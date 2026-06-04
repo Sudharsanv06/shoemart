@@ -1,12 +1,19 @@
-const transporter = require("../config/mailer");
+const { Resend } = require("resend");
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html }) => {
   try {
-    await transporter.sendMail({ from: process.env.EMAIL_FROM || process.env.EMAIL_USER, to, subject, html });
-    console.log(`✅ Email sent to ${to}`);
-  } catch (err) {
-    console.error(`❌ Email failed:`, err.message);
-    // Do NOT throw or rethrow here — email failure must never break order creation
+    const response = await resend.emails.send({
+      from: "ShoeMart <onboarding@resend.dev>",
+      to,
+      subject,
+      html,
+    });
+
+    console.log("✅ Email sent:", response.data?.id || response.id);
+  } catch (error) {
+    console.error("❌ Email failed:", error);
   }
 };
 
