@@ -201,3 +201,36 @@ exports.updateOrderStatus = async (req, res, next) => {
     res.json(new ApiResponse(200, order, "Status updated"));
   } catch (e) { next(e); }
 };
+
+const generateInvoice = require("../utils/generateInvoice");
+
+exports.downloadInvoice = async (req, res, next) => {
+  try {
+    const order = await prisma.order.findUnique({
+      where:   { id: req.params.id },
+      include: {
+        items:   { include: { product: true } },
+        address: true,
+        user:    true,
+      },
+    });
+
+    if (!order)
+      throw new ApiError(404, "Order not found");
+
+    if (order.userId !== req.user.id && req.user.role !== "ADMIN")
+      throw new ApiError(403, "Not authorized");
+
+    const pdfBuffer = await generateInvoice(order, order.user);
+
+    res.set({
+      "Content-Type":        "application/pdf",
+      "Content-Disposition": `attachment; filename="SHOEMART-Invoice-${order.orderNumber}.pdf"`,
+      "Content-Length":      pdfBuffer.length,
+    });
+    res.end(pdfBuffer);
+  } catch (e) {
+    console.error("Invoice generation error:", e.message);
+    next(e);
+  }
+};

@@ -88,6 +88,21 @@ export default function Orders() {
               <div className="text-right space-y-1">
                 <p className="text-xl font-semibold text-gold">₹{order.total.toLocaleString()}</p>
                 <p className="text-ivory/60 text-sm">{order.items.length} item{order.items.length !== 1 ? "s" : ""}</p>
+                <button
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    try {
+                      await orderAPI.getInvoice(order.id);
+                      toast.success("Invoice downloaded!");
+                    } catch {
+                      toast.error("Failed to download");
+                    }
+                  }}
+                  className="text-gold text-xs hover:underline block ml-auto mt-1"
+                >
+                  ↓ Invoice
+                </button>
               </div>
 
               <ChevronRight size={20} className="ml-4 text-gold group-hover:translate-x-1 transition-transform" />

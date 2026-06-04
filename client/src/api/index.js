@@ -86,6 +86,22 @@ export const orderAPI = {
   create:  (data) => api.post("/orders",           data),
   getAll:  ()     => api.get("/orders"),
   getOne:  (id)   => api.get(`/orders/${id}`),
+  getInvoice: async (id) => {
+    const token = store.getState().auth.token || localStorage.getItem("shoemart_token");
+    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    const res = await fetch(
+      `${baseUrl}/orders/${id}/invoice`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!res.ok) throw new Error("Failed to download invoice");
+    const blob = await res.blob();
+    const url  = window.URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `SHOEMART-Invoice-${id}.pdf`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  },
   // admin
   adminAll:    ()           => api.get("/orders/admin/all"),
   adminUpdate: (id, status) => api.patch(`/orders/admin/${id}`, { status }),

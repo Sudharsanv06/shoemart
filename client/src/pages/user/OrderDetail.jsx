@@ -20,6 +20,19 @@ export default function OrderDetail() {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadInvoice = async () => {
+    try {
+      setDownloading(true);
+      await orderAPI.getInvoice(order.id);
+      toast.success("Invoice downloaded!");
+    } catch (err) {
+      toast.error("Failed to download invoice");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -55,7 +68,7 @@ export default function OrderDetail() {
           <div className="flex justify-between items-start mb-4">
             <div>
               <h1 className="font-display text-2xl text-ivory mb-2">Order #{order.orderNumber || order.id.slice(0, 8).toUpperCase()}</h1>
-              <p className="text-ivory/60 text-sm">
+              <p className="text-ivory/60 text-sm mb-4">
                 Placed on{" "}
                 {new Date(order.createdAt).toLocaleDateString("en-US", {
                   year: "numeric",
@@ -63,6 +76,17 @@ export default function OrderDetail() {
                   day: "numeric",
                 })}
               </p>
+              <button
+                onClick={handleDownloadInvoice}
+                disabled={downloading}
+                className="btn-outline flex items-center gap-2 text-xs"
+              >
+                {downloading
+                  ? <div className="w-3 h-3 border border-gold border-t-transparent rounded-full animate-spin" />
+                  : <span>↓</span>
+                }
+                {downloading ? "Downloading..." : "Download Invoice"}
+              </button>
             </div>
             <div className="text-right">
               <p className="text-2xl font-semibold text-gold">₹{order.total.toLocaleString()}</p>
