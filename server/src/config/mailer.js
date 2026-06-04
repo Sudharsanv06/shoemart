@@ -1,3 +1,5 @@
+console.log("📧 Email module loaded");
+
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
