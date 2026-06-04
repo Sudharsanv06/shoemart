@@ -11,7 +11,12 @@ const sendEmail = async ({ to, subject, html }) => {
       html,
     });
 
-    console.log("✅ Email sent:", response.data?.id || response.id);
+    if (response.error) {
+      console.error("❌ Email failed:", response.error);
+      return;
+    }
+
+    console.log("✅ Email sent:", response.data?.id);
   } catch (error) {
     console.error("❌ Email failed:", error);
   }
