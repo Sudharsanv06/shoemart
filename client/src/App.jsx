@@ -4,6 +4,7 @@ import Navbar from "./components/common/Navbar";
 import Footer from "./components/common/Footer";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import ScrollToTop from "./components/common/ScrollToTop";
+import Chatbot from "./components/common/Chatbot";
 
 // Public
 import Home from "./pages/public/Home";
@@ -42,6 +43,7 @@ function App() {
   return (
     <div className="min-h-screen bg-obsidian text-ivory font-body">
       <ScrollToTop />
+      <Chatbot />
 
       <Routes>
         {/* Admin routes — own layout, no Navbar/Footer */}

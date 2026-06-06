@@ -152,5 +152,5 @@ app.get("/api/health", (_, res) =>
 // =========================
 
 app.use(require("./middlewares/error.middleware"));
-
+app.use("/api/chat", require("./routes/chat.routes"));
 module.exports = app;

@@ -158,4 +158,8 @@ export const reviewAPI = {
   adminGetAll: () => api.get("/reviews/admin/all"),
 };
 
+export const chatAPI = {
+  send: (messages) => api.post("/chat", { messages }),
+};
+
 export default api;
