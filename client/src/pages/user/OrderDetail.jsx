@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { orderAPI } from "../../api";
 import Loader from "../../components/common/Loader";
+import OrderTimeline from "../../components/common/OrderTimeline";
 import { ChevronLeft, MapPin, Package, Truck, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -170,6 +171,12 @@ export default function OrderDetail() {
                     {order.deliveryCharge === 0 ? "FREE" : `₹${order.deliveryCharge}`}
                   </span>
                 </div>
+                {order.discount > 0 && (
+                  <div className="flex justify-between text-green-400">
+                    <span>Discount{order.couponCode ? ` (${order.couponCode})` : ""}</span>
+                    <span>-₹{order.discount.toLocaleString()}</span>
+                  </div>
+                )}
               </div>
               <div className="flex justify-between text-lg font-semibold">
                 <span>Total</span>
@@ -177,35 +184,11 @@ export default function OrderDetail() {
               </div>
             </div>
 
-            {/* Status Timeline */}
-            <div className="bg-charcoal border border-white/10 p-6">
-              <h2 className="font-display text-xl text-gold mb-6">Order Timeline</h2>
-              <div className="space-y-4">
-                {statusSteps.map((step, idx) => (
-                  <div key={step} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          idx <= currentStepIndex ? "bg-gold text-obsidian" : "bg-white/10 text-ivory/30"
-                        }`}
-                      >
-                        {idx < currentStepIndex ? "✓" : idx === currentStepIndex ? <Package size={16} /> : idx}
-                      </div>
-                      {idx < statusSteps.length - 1 && (
-                        <div
-                          className={`w-0.5 h-8 my-1 ${idx < currentStepIndex ? "bg-gold" : "bg-white/10"}`}
-                        />
-                      )}
-                    </div>
-                    <div className="pt-1">
-                      <p className={`font-semibold ${idx <= currentStepIndex ? "text-gold" : "text-ivory/40"}`}>
-                        {step}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Order Timeline */}
+            <OrderTimeline
+              status={order.status}
+              statusLogs={order.statusLogs || []}
+            />
           </div>
         </div>
       </div>

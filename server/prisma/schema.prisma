@@ -107,6 +107,7 @@ model Order {
   address         Address?      @relation(fields: [addressId], references: [id])
   user            User          @relation(fields: [userId], references: [id])
   items           OrderItem[]
+  statusLogs      OrderStatusLog[]
 }
 
 model OrderItem {
@@ -118,6 +119,15 @@ model OrderItem {
   orderId   String
   order     Order   @relation(fields: [orderId], references: [id])
   product   Product @relation(fields: [productId], references: [id])
+}
+
+model OrderStatusLog {
+  id        String      @id @default(cuid())
+  orderId   String
+  status    OrderStatus
+  message   String?
+  createdAt DateTime    @default(now())
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model Review {

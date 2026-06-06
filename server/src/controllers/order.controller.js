@@ -1,10 +1,8 @@
-const prisma      = require("../config/db");
+const prisma = require("../config/db");
 const ApiResponse = require("../utils/ApiResponse");
-const ApiError    = require("../utils/ApiError");
+const ApiError = require("../utils/ApiError");
 const sendEmail = require("../utils/sendEmail");
 const emailTemplates = require("../utils/emailTemplates");
-
-
 
 const toArr = (val) => {
   if (!val) return [];
@@ -84,7 +82,6 @@ exports.createOrder = async (req, res, next) => {
         addressId: resolvedAddressId,
         discount: Number(discount || 0),
         couponCode,
-        // Store razorpay IDs in stripePaymentId field temporarily (it exists in DB already)
         stripePaymentId: req.body.razorpayPaymentId || req.body.razorpayOrderId || null,
         paymentMethod: "RAZORPAY",
         subtotal, deliveryCharge, total,
@@ -100,13 +97,22 @@ exports.createOrder = async (req, res, next) => {
       include: { items: { include: { product: true } }, address: true },
     });
 
+    // Log initial status
+    await prisma.orderStatusLog.create({
+      data: {
+        orderId: order.id,
+        status: "CONFIRMED",
+        message: "Order placed and confirmed successfully",
+      },
+    });
+
     // Clear cart after order
     await prisma.cartItem.deleteMany({ where: { userId: req.user.id } });
 
     // Send order confirmation email (non-blocking)
     try {
       const fullOrder = await prisma.order.findUnique({
-        where:   { id: order.id },
+        where: { id: order.id },
         include: { items: { include: { product: true } }, address: true },
       });
       const emailData = emailTemplates.orderConfirmationEmail(req.user, fullOrder);
@@ -140,11 +146,19 @@ exports.getUserOrders = async (req, res, next) => {
 
 exports.getOrder = async (req, res, next) => {
   try {
-    const order = await prisma.order.findFirst({
-      where: { id: req.params.id, userId: req.user.id },
-      include: { items: { include: { product: true } }, address: true },
+    const order = await prisma.order.findUnique({
+      where: { id: req.params.id },
+      include: {
+        items: { include: { product: true } },
+        address: true,
+        statusLogs: { orderBy: { createdAt: "asc" } },
+      },
     });
+
     if (!order) throw new ApiError(404, "Order not found");
+    if (order.userId !== req.user.id && req.user.role !== "ADMIN")
+      throw new ApiError(403, "Not authorized");
+
     res.json(new ApiResponse(200, {
       ...order,
       items: order.items.map((item) => ({
@@ -190,6 +204,7 @@ exports.getAdminOrder = async (req, res, next) => {
         user: { select: { id: true, name: true, email: true, phone: true } },
         address: true,
         items: { include: { product: true } },
+        statusLogs: { orderBy: { createdAt: "asc" } },
       },
     });
 
@@ -208,21 +223,41 @@ exports.getAdminOrder = async (req, res, next) => {
 exports.updateOrderStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
-    const order = await prisma.order.update({ where: { id: req.params.id }, data: { status } });
+
+    const order = await prisma.order.update({
+      where: { id: req.params.id },
+      data: { status },
+      include: {
+        items: { include: { product: true } },
+        user: true,
+      },
+    });
+
+    // Log the status change
+    const statusMessages = {
+      PENDING: "Order is pending confirmation",
+      CONFIRMED: "Order confirmed and being prepared",
+      PROCESSING: "Order is being packed and processed",
+      SHIPPED: "Order has been shipped and is on the way",
+      DELIVERED: "Order delivered successfully",
+      CANCELLED: "Order has been cancelled",
+      RETURNED: "Order return has been initiated",
+    };
+
+    await prisma.orderStatusLog.create({
+      data: {
+        orderId: order.id,
+        status,
+        message: statusMessages[status] || "Order status updated",
+      },
+    });
 
     // Send status update email
     try {
-      const fullOrder = await prisma.order.findUnique({
-        where:   { id: req.params.id },
-        include: {
-          items:   { include: { product: true } },
-          user:    true,
-        },
-      });
-      const emailData = emailTemplates.orderStatusEmail(fullOrder.user, fullOrder);
-      sendEmail({ to: fullOrder.user.email, ...emailData });
+      const emailData = emailTemplates.orderStatusEmail(order.user, order);
+      sendEmail({ to: order.user.email, ...emailData });
     } catch (emailErr) {
-      console.error("Email send failed:", emailErr.message);
+      console.error("Email failed:", emailErr.message);
     }
 
     res.json(new ApiResponse(200, order, "Status updated"));
@@ -234,11 +269,11 @@ const generateInvoice = require("../utils/generateInvoice");
 exports.downloadInvoice = async (req, res, next) => {
   try {
     const order = await prisma.order.findUnique({
-      where:   { id: req.params.id },
+      where: { id: req.params.id },
       include: {
-        items:   { include: { product: true } },
+        items: { include: { product: true } },
         address: true,
-        user:    true,
+        user: true,
       },
     });
 
@@ -251,9 +286,9 @@ exports.downloadInvoice = async (req, res, next) => {
     const pdfBuffer = await generateInvoice(order, order.user);
 
     res.set({
-      "Content-Type":        "application/pdf",
+      "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename="SHOEMART-Invoice-${order.orderNumber}.pdf"`,
-      "Content-Length":      pdfBuffer.length,
+      "Content-Length": pdfBuffer.length,
     });
     res.end(pdfBuffer);
   } catch (e) {
