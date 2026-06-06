@@ -22,6 +22,8 @@ exports.createOrder = async (req, res, next) => {
       paymentMethod = "RAZORPAY",
       razorpayOrderId,
       razorpayPaymentId,
+      discount = 0,
+      couponCode = null,
     } = req.body;
     const cartItems = await prisma.cartItem.findMany({
       where: { userId: req.user.id }, include: { product: true }
@@ -49,14 +51,39 @@ exports.createOrder = async (req, res, next) => {
 
     if (!resolvedAddressId) throw new ApiError(400, "Address is required");
 
-    const subtotal      = cartItems.reduce((s, i) => s + i.product.price * i.quantity, 0);
+    const subtotal = cartItems.reduce(
+      (s, i) => s + i.product.price * i.quantity,
+      0
+    );
+
     const deliveryCharge = subtotal >= 999 ? 0 : 99;
-    const total          = subtotal + deliveryCharge;
+
+    const total = Math.max(
+      subtotal + deliveryCharge - Number(discount || 0),
+      0
+    );
+
+    // Increase coupon usage count if coupon was applied
+    if (couponCode) {
+      await prisma.coupon.updateMany({
+        where: {
+          code: couponCode,
+          isActive: true,
+        },
+        data: {
+          usedCount: {
+            increment: 1,
+          },
+        },
+      });
+    }
 
     const order = await prisma.order.create({
       data: {
         userId: req.user.id,
         addressId: resolvedAddressId,
+        discount: Number(discount || 0),
+        couponCode,
         // Store razorpay IDs in stripePaymentId field temporarily (it exists in DB already)
         stripePaymentId: req.body.razorpayPaymentId || req.body.razorpayOrderId || null,
         paymentMethod: "RAZORPAY",

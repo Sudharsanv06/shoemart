@@ -5,7 +5,7 @@ import AdminSidebar from "../../components/admin/AdminSidebar";
 import { Search, Edit, Trash2, Plus } from "lucide-react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import toast from "react-hot-toast";
-
+import AdminHeader from "../../components/admin/AdminHeader";
 const FALLBACK_IMAGE = "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg";
 
 const getImage = (images) => {

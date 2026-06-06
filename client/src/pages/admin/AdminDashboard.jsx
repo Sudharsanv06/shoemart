@@ -4,6 +4,7 @@ import AdminSidebar from "../../components/admin/AdminSidebar";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { FiTrendingUp, FiShoppingCart, FiBox, FiUsers } from "react-icons/fi";
 import toast from "react-hot-toast";
+import AdminHeader from "../../components/admin/AdminHeader";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -38,7 +39,7 @@ export default function AdminDashboard() {
     };
     fetchData();
   }, []);
-
+  
   const orderChartData = orders.reduce((acc, order) => {
     const dateKey = new Date(order.createdAt).toLocaleDateString("en-IN", {
       day: "2-digit",
@@ -53,7 +54,7 @@ export default function AdminDashboard() {
     }
     return acc;
   }, []);
-
+  
   // Order status distribution
   const orderStatusData = orders.reduce(
     (acc, order) => {

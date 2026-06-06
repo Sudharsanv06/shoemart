@@ -39,6 +39,16 @@ const orderConfirmationEmail = (user, order) => {
 
         <div style="text-align: right; font-size: 16px; margin: 20px 0;">
           <p><strong>Subtotal:</strong> ₹${order.subtotal}</p>
+          ${order.discount > 0 ? `
+          <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+            <span style="color:#4ade80; font-family:sans-serif; font-size:14px; margin-right:20px;">
+              Discount${order.couponCode ? ` (${order.couponCode})` : ""}
+            </span>
+            <span style="color:#4ade80; font-family:sans-serif; font-size:14px; font-weight:600;">
+              -₹${order.discount.toLocaleString("en-IN")}
+            </span>
+          </div>
+          ` : ""}
           <p><strong>Delivery Charge:</strong> ₹${order.deliveryCharge}</p>
           <p style="font-size: 18px; color: #111;"><strong>Total:</strong> ₹${order.total}</p>
         </div>

@@ -1,14 +1,23 @@
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FiGrid, FiBox, FiShoppingBag, FiUsers, FiStar, FiLogOut } from "react-icons/fi";
+import {
+  FiGrid,
+  FiBox,
+  FiShoppingBag,
+  FiUsers,
+  FiStar,
+  FiTag,
+  FiLogOut,
+} from "react-icons/fi";
 import { logout } from "../../store/authSlice";
 
 const navItems = [
-  { label: "Dashboard", icon: FiGrid, path: "/admin" },
-  { label: "Products", icon: FiBox, path: "/admin/products" },
-  { label: "Orders", icon: FiShoppingBag, path: "/admin/orders" },
-  { label: "Users", icon: FiUsers, path: "/admin/users" },
-  { label: "Reviews", icon: FiStar, path: "/admin/reviews" },
+  { path: "/admin", label: "Dashboard", icon: FiGrid },
+  { path: "/admin/products", label: "Products", icon: FiBox },
+  { path: "/admin/orders", label: "Orders", icon: FiShoppingBag },
+  { path: "/admin/users", label: "Users", icon: FiUsers },
+  { path: "/admin/reviews", label: "Reviews", icon: FiStar },
+  { path: "/admin/coupons", label: "Coupons", icon: FiTag },
 ];
 
 export default function AdminSidebar() {
@@ -25,11 +34,15 @@ export default function AdminSidebar() {
     <div className="w-64 bg-charcoal border-r border-white/10 h-screen sticky top-0 flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-white/10">
-        <Link to="/" className="font-display text-2xl text-gold tracking-widest hover:text-ivory transition-colors">
+        <Link
+          to="/"
+          className="font-display text-2xl text-gold tracking-widest hover:text-ivory transition-colors"
+        >
           SHOEMART
         </Link>
       </div>
 
+      {/* Back to Store */}
       <div className="p-4 border-b border-white/10">
         <Link
           to="/"
@@ -39,11 +52,15 @@ export default function AdminSidebar() {
         </Link>
       </div>
 
-      {/* Nav Items */}
+      {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = location.pathname === item.path;
+          const isActive =
+            location.pathname === item.path ||
+            (item.path !== "/admin" &&
+              location.pathname.startsWith(item.path));
+
           return (
             <Link
               key={item.path}
@@ -61,7 +78,7 @@ export default function AdminSidebar() {
         })}
       </nav>
 
-      {/* Logout Button */}
+      {/* Logout */}
       <div className="p-4 border-t border-white/10">
         <button
           onClick={handleLogout}

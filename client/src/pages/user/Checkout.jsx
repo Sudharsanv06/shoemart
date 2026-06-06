@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { authAPI, orderAPI, paymentAPI } from "../../api";
+import api, { authAPI, orderAPI, paymentAPI } from "../../api";
 import { clearCart } from "../../store/cartSlice";
 import Loader from "../../components/common/Loader";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
@@ -38,6 +38,10 @@ export default function Checkout() {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [addressForm, setAddressForm] = useState(emptyAddress);
   const [submitting, setSubmitting] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponData, setCouponData] = useState(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [discount, setDiscount] = useState(0);
 
   const getItemProduct = (item) => item.product || {};
 
@@ -64,6 +68,7 @@ export default function Checkout() {
   );
   const deliveryCharge = subtotal >= 999 ? 0 : 99;
   const total = subtotal + deliveryCharge;
+  const finalTotal = total - discount;
 
   const resetAddressForm = () => setAddressForm(emptyAddress);
 
@@ -97,6 +102,50 @@ export default function Checkout() {
 
   const selectedAddressObject = addresses.find((address) => address.id === selectedAddress) || null;
 
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      toast.error("Enter a coupon code");
+      return;
+    }
+
+    try {
+      setCouponLoading(true);
+
+      const res = await api.post("/coupons/validate", {
+        code: couponCode.toUpperCase().trim(),
+        orderTotal: subtotal,
+      });
+
+      setCouponData(res.data.data.coupon);
+      setDiscount(res.data.data.discount);
+
+      toast.success(
+        `🎉 Coupon applied! You save ₹${res.data.data.discount.toLocaleString(
+          "en-IN"
+        )}`
+      );
+    } catch (e) {
+      toast.error(
+        e.response?.data?.message || "Invalid coupon code"
+      );
+
+      setCouponData(null);
+      setDiscount(0);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponCode("");
+    setCouponData(null);
+    setDiscount(0);
+
+    toast("Coupon removed", {
+      icon: "🗑️",
+    });
+  };
+
   const handlePayment = async () => {
     try {
       if (!selectedAddressObject) {
@@ -111,7 +160,7 @@ export default function Checkout() {
 
       setSubmitting(true);
 
-      const { data } = await paymentAPI.createOrder(total);
+      const { data } = await paymentAPI.createOrder(finalTotal);
       const { orderId, amount, currency, keyId } = data.data;
 
       const rzp = new window.Razorpay({
@@ -144,7 +193,9 @@ export default function Checkout() {
               })),
               subtotal,
               deliveryCharge,
-              total,
+              total: finalTotal,
+              discount,
+              couponCode: couponData?.code || null,
             });
 
             dispatch(clearCart());
@@ -421,6 +472,85 @@ export default function Checkout() {
                       </div>
                     ))}
                   </div>
+
+                  <div className="mt-6 p-5 bg-carbon border border-white/10 rounded-sm">
+                    <p className="text-muted text-xs tracking-widest uppercase mb-3">
+                      Have a coupon code?
+                    </p>
+
+                    {couponData ? (
+                      <div className="flex items-center justify-between bg-green-500/10 border border-green-500/30 px-4 py-3 rounded-sm">
+                        <div>
+                          <p className="text-green-400 font-mono font-bold tracking-widest">
+                            {couponData.code}
+                          </p>
+
+                          <p className="text-green-400 text-xs mt-0.5">
+                            {couponData.discountType === "PERCENTAGE"
+                              ? `${couponData.discountValue}% off applied`
+                              : `₹${couponData.discountValue} off applied`}
+                            {" — "}You save ₹{discount.toLocaleString("en-IN")}
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={handleRemoveCoupon}
+                          className="text-muted hover:text-red-400 text-xs transition-colors underline"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <input
+                          className="flex-1 px-4 py-2 bg-obsidian border border-white/20 text-ivory uppercase"
+                          placeholder="SAVE20"
+                          value={couponCode}
+                          onChange={(e) =>
+                            setCouponCode(e.target.value.toUpperCase())
+                          }
+                        />
+
+                        <button
+                          onClick={handleApplyCoupon}
+                          disabled={couponLoading}
+                          className="btn-gold px-6"
+                        >
+                          {couponLoading ? "Checking..." : "Apply"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-6 p-5 bg-charcoal border border-white/10 rounded-sm space-y-3">
+                    <div className="flex justify-between">
+                      <span>Subtotal</span>
+                      <span>₹{subtotal.toLocaleString("en-IN")}</span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span>Delivery</span>
+                      <span>
+                        {deliveryCharge === 0
+                          ? "FREE"
+                          : `₹${deliveryCharge}`}
+                      </span>
+                    </div>
+
+                    {discount > 0 && (
+                      <div className="flex justify-between text-green-400">
+                        <span>Discount ({couponData?.code})</span>
+                        <span>-₹{discount.toLocaleString("en-IN")}</span>
+                      </div>
+                    )}
+
+                    <div className="border-t border-white/10 pt-3 flex justify-between font-semibold">
+                      <span>Total</span>
+                      <span className="text-gold">
+                        ₹{finalTotal.toLocaleString("en-IN")}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex justify-between gap-4">
@@ -455,9 +585,15 @@ export default function Checkout() {
                     <span>Delivery</span>
                     <span>{deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}</span>
                   </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-green-400">
+                      <span>Discount ({couponData?.code})</span>
+                      <span>-₹{discount.toLocaleString("en-IN")}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-lg font-semibold pt-3 border-t border-white/10">
                     <span>Total</span>
-                    <span className="text-gold">₹{total.toLocaleString("en-IN")}</span>
+                    <span className="text-gold">₹{finalTotal.toLocaleString("en-IN")}</span>
                   </div>
                 </div>
 
@@ -469,7 +605,7 @@ export default function Checkout() {
                   {submitting && (
                     <div className="w-4 h-4 border-2 border-obsidian/30 border-t-obsidian rounded-full animate-spin" />
                   )}
-                  {submitting ? "Processing..." : `Pay ₹${total.toLocaleString("en-IN")}`}
+                  {submitting ? "Processing..." : `Pay ₹${finalTotal.toLocaleString("en-IN")}`}
                 </button>
 
                 <button
@@ -496,22 +632,30 @@ export default function Checkout() {
                   <span>Delivery</span>
                   <span>{deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}</span>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-green-400">
+                    <span>Discount ({couponData?.code})</span>
+                    <span>-₹{discount.toLocaleString("en-IN")}</span>
+                  </div>
+                )}
                 <div className="border-t border-white/10 pt-4 flex justify-between text-lg font-semibold">
                   <span>Total</span>
-                  <span className="text-gold">₹{total.toLocaleString("en-IN")}</span>
+                  <span className="text-gold">
+                    ₹{finalTotal.toLocaleString("en-IN")}
+                  </span>
                 </div>
               </div>
 
-              {selectedAddress && (
+              {selectedAddressObject && (
                 <div className="border-t border-white/10 pt-4 space-y-1">
                   <h4 className="font-semibold text-ivory">Deliver To</h4>
-                  <p className="text-sm text-ivory/70">{selectedAddress.fullName}</p>
-                  <p className="text-sm text-ivory/70">{selectedAddress.line1}</p>
-                  {selectedAddress.line2 && <p className="text-sm text-ivory/70">{selectedAddress.line2}</p>}
+                  <p className="text-sm text-ivory/70">{selectedAddressObject.fullName}</p>
+                  <p className="text-sm text-ivory/70">{selectedAddressObject.line1}</p>
+                  {selectedAddressObject.line2 && <p className="text-sm text-ivory/70">{selectedAddressObject.line2}</p>}
                   <p className="text-sm text-ivory/70">
-                    {selectedAddress.city}, {selectedAddress.state} {selectedAddress.pincode}
+                    {selectedAddressObject.city}, {selectedAddressObject.state} {selectedAddressObject.pincode}
                   </p>
-                  <p className="text-sm text-ivory/70">{selectedAddress.phone}</p>
+                  <p className="text-sm text-ivory/70">{selectedAddressObject.phone}</p>
                 </div>
               )}
             </div>

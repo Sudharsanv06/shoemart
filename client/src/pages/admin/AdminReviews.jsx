@@ -4,7 +4,7 @@ import AdminSidebar from "../../components/admin/AdminSidebar";
 import StarRating from "../../components/common/StarRating";
 import { Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
-
+import AdminHeader from "../../components/admin/AdminHeader";
 export default function AdminReviews() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);

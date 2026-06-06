@@ -114,6 +114,21 @@ const generateInvoice = (order, user) => {
          .text(order.deliveryCharge === 0 ? "FREE" : `Rs.${order.deliveryCharge}`, valueCol, y, { align: "right", width: 60 });
       y += 18;
 
+      // ── DISCOUNT ROW (ADDED) ─────────────────────────────
+      if (order.discount > 0) {
+        doc.fillColor("#4ade80").font("Helvetica").fontSize(9)
+           .text(
+             order.couponCode ? `Discount (${order.couponCode})` : "Discount",
+             rightCol, y, { align: "right", width: 80 }
+           )
+           .text(
+             `-Rs.${order.discount.toLocaleString("en-IN")}`,
+             valueCol, y, { align: "right", width: 60 }
+           );
+        y += 18;
+      }
+
+      // ── TOTAL BOX ────────────────────────────────────────
       doc.rect(rightCol - 10, y - 4, 130, 26).fill("#C9A84C");
       doc.fillColor("#0D0D0D").font("Helvetica-Bold").fontSize(11)
          .text("TOTAL",           rightCol, y + 3,  { align: "right", width: 80 })

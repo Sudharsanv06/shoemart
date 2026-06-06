@@ -19,9 +19,9 @@ api.interceptors.response.use(
   (r) => r,
   (err) => {
     if (err.response?.status === 401) {
-      try { store.dispatch(logout()); } catch (e) {}
-      try { localStorage.removeItem("shoemart_token"); } catch (e) {}
-      try { window.location.href = "/login"; } catch (e) {}
+      try { store.dispatch(logout()); } catch (e) { }
+      try { localStorage.removeItem("shoemart_token"); } catch (e) { }
+      try { window.location.href = "/login"; } catch (e) { }
     }
     return Promise.reject(err);
   }
@@ -29,30 +29,30 @@ api.interceptors.response.use(
 
 // AUTH
 export const authAPI = {
-  signup:  (data) => api.post("/auth/signup",  data),
-  login:   (data) => api.post("/auth/login",   data),
-  me:      ()     => api.get("/auth/me"),
+  signup: (data) => api.post("/auth/signup", data),
+  login: (data) => api.post("/auth/login", data),
+  me: () => api.get("/auth/me"),
   updateProfile: (data) => api.patch("/auth/profile", data, {
     headers: data instanceof FormData
       ? { "Content-Type": "multipart/form-data" }
       : { "Content-Type": "application/json" },
   }),
-  getMe:   ()     => api.get("/auth/me"),
-  update:  (data) => api.patch("/auth/me",     data),
+  getMe: () => api.get("/auth/me"),
+  update: (data) => api.patch("/auth/me", data),
 };
 
 // PRODUCTS
 export const productAPI = {
-  getAll:      (params) => api.get("/products",          { params }),
-  getOne:      (id)     => api.get(`/products/${id}`),
-  getFeatured: ()       => api.get("/products/featured"),
-  getNew:      ()       => api.get("/products/new"),
-  create:      (data, config = {})   => api.post("/products", data, {
+  getAll: (params) => api.get("/products", { params }),
+  getOne: (id) => api.get(`/products/${id}`),
+  getFeatured: () => api.get("/products/featured"),
+  getNew: () => api.get("/products/new"),
+  create: (data, config = {}) => api.post("/products", data, {
     headers: { "Content-Type": "multipart/form-data" },
     timeout: 30000,
     ...config,
   }),
-  update:      (id, data) => api.patch(
+  update: (id, data) => api.patch(
     `/products/${id}`,
     data,
     {
@@ -62,30 +62,30 @@ export const productAPI = {
       timeout: 30000,
     }
   ),
-  delete:      (id)     => api.delete(`/products/${id}`),
+  delete: (id) => api.delete(`/products/${id}`),
 };
 
 // CART
 export const cartAPI = {
-  get:    ()             => api.get("/cart"),
-  add:    (data)         => api.post("/cart",       data),
+  get: () => api.get("/cart"),
+  add: (data) => api.post("/cart", data),
   update: (id, quantity) => api.patch(`/cart/${id}`, { quantity }),
-  remove: (id)           => api.delete(`/cart/${id}`),
-  clear:  ()             => api.delete("/cart/clear"),
+  remove: (id) => api.delete(`/cart/${id}`),
+  clear: () => api.delete("/cart/clear"),
 };
 
 // WISHLIST
 export const wishlistAPI = {
-  get:    ()    => api.get("/wishlist"),
-  add:    (pid) => api.post("/wishlist",           { productId: pid }),
+  get: () => api.get("/wishlist"),
+  add: (pid) => api.post("/wishlist", { productId: pid }),
   remove: (pid) => api.delete(`/wishlist/${pid}`),
 };
 
 // ORDERS
 export const orderAPI = {
-  create:  (data) => api.post("/orders",           data),
-  getAll:  ()     => api.get("/orders"),
-  getOne:  (id)   => api.get(`/orders/${id}`),
+  create: (data) => api.post("/orders", data),
+  getAll: () => api.get("/orders"),
+  getOne: (id) => api.get(`/orders/${id}`),
   getInvoice: async (id) => {
     const token = store.getState().auth.token || localStorage.getItem("shoemart_token");
     const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -95,15 +95,15 @@ export const orderAPI = {
     );
     if (!res.ok) throw new Error("Failed to download invoice");
     const blob = await res.blob();
-    const url  = window.URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    a.href     = url;
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
     a.download = `SHOEMART-Invoice-${id}.pdf`;
     a.click();
     window.URL.revokeObjectURL(url);
   },
   // admin
-  adminAll:    ()           => api.get("/orders/admin/all"),
+  adminAll: () => api.get("/orders/admin/all"),
   adminUpdate: (id, status) => api.patch(`/orders/admin/${id}`, { status }),
 };
 
@@ -115,18 +115,47 @@ export const paymentAPI = {
 
 // ADMIN
 export const adminAPI = {
+  // Dashboard
   getStats: () => api.get("/admin/stats"),
-  getUsers: () => api.get("/admin/users"),
-  updateRole: (id, role) => api.put(`/admin/users/${id}/role`, { role }),
-  deleteUser: (id) => api.delete(`/admin/users/${id}`),
+  getAnalytics: (days = 30) =>
+    api.get(`/admin/analytics?days=${days}`),
+  getLowStock: () =>
+    api.get("/admin/low-stock"),
+
+  // Users
+  getUsers: () =>
+    api.get("/admin/users"),
+  updateRole: (id, role) =>
+    api.put(`/admin/users/${id}/role`, { role }),
+  deleteUser: (id) =>
+    api.delete(`/admin/users/${id}`),
+
+  // Coupons
+  getCoupons: () =>
+    api.get("/admin/coupons"),
+
+  createCoupon: (data) =>
+    api.post("/admin/coupons", data),
+
+  toggleCoupon: (id, isActive) =>
+    api.patch(`/admin/coupons/${id}`, { isActive }),
+
+  deleteCoupon: (id) =>
+    api.delete(`/admin/coupons/${id}`),
+
+  validateCoupon: (code, orderTotal) =>
+    api.post("/coupons/validate", {
+      code,
+      orderTotal,
+    }),
 };
 
 // REVIEWS
 export const reviewAPI = {
   getByProduct: (productId) => api.get(`/reviews/${productId}`),
-  add:          (productId, data) => api.post(`/reviews/${productId}`, data),
-  delete:       (id)         => api.delete(`/reviews/${id}`),
-  adminGetAll:  ()           => api.get("/reviews/admin/all"),
+  add: (productId, data) => api.post(`/reviews/${productId}`, data),
+  delete: (id) => api.delete(`/reviews/${id}`),
+  adminGetAll: () => api.get("/reviews/admin/all"),
 };
 
 export default api;
