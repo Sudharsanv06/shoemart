@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { productAPI } from "../../api";
 import ProductCard from "../../components/common/ProductCard";
 import Loader from "../../components/common/Loader";
+import RecentlyViewed from "../../components/common/RecentlyViewed";
 import { ChevronRight, Truck, RotateCcw, Shield, Lock, Zap } from "lucide-react";
 import toast from "react-hot-toast";
 import mensImg from "../../assets/categories/mens.jpg";
@@ -225,6 +226,11 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Recently Viewed Section */}
+      <div className="container mx-auto px-4 pb-16">
+        <RecentlyViewed />
+      </div>
     </div>
   );
 }

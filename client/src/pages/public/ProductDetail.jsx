@@ -8,6 +8,8 @@ import ProductCard from "../../components/common/ProductCard";
 import Loader from "../../components/common/Loader";
 import ReviewSection from "../../components/common/ReviewSection";
 import StarRating from "../../components/common/StarRating";
+import RecentlyViewed from "../../components/common/RecentlyViewed";
+import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 import { Heart, Star, ChevronUp, ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -33,6 +35,7 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((s) => s.auth);
+  const { addProduct } = useRecentlyViewed();
 
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
@@ -59,6 +62,18 @@ export default function ProductDetail() {
       setProduct(prod);
       setMainImage(getFirstImage(prod.images));
       
+      // Track recently viewed
+      addProduct({
+        id:       prod.id,
+        name:     prod.name,
+        brand:    prod.brand,
+        price:    prod.price,
+        mrp:      prod.mrp,
+        images:   prod.images,
+        category: prod.category,
+        rating:   prod.rating,
+      });
+
       // Fetch related products (same brand)
       const relatedRes = await productAPI.getAll({ brand: prod.brand });
       setRelated(relatedRes.data.data.products?.filter(p => p.id !== id).slice(0, 4) || []);
@@ -347,6 +362,9 @@ export default function ProductDetail() {
 
         {/* Reviews Section */}
         <ReviewSection productId={product.id} onReviewUpdate={handleReviewUpdate} />
+
+        {/* Recently Viewed */}
+        <RecentlyViewed currentProductId={product?.id} />
       </div>
     </div>
   );
