@@ -9,6 +9,7 @@ import Loader from "../../components/common/Loader";
 import ReviewSection from "../../components/common/ReviewSection";
 import StarRating from "../../components/common/StarRating";
 import RecentlyViewed from "../../components/common/RecentlyViewed";
+import SizeGuideModal from "../../components/common/SizeGuideModal";
 import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 import { Heart, Star, ChevronUp, ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
@@ -47,6 +48,8 @@ export default function ProductDetail() {
   const [activeTab, setActiveTab] = useState("description");
   const [addingToCart, setAddingToCart] = useState(false);
   const [addingToWishlist, setAddingToWishlist] = useState(false);
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+
   const sizes = Array.isArray(product?.sizes)
     ? product.sizes
     : typeof product?.sizes === "string"
@@ -234,6 +237,22 @@ export default function ProductDetail() {
             {/* Size Selector */}
             {sizes.length > 0 && (
               <div>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-muted text-xs tracking-widest uppercase">
+                    Select Size
+                  </p>
+                  <button
+                    onClick={() => setSizeGuideOpen(true)}
+                    className="text-gold text-xs hover:underline flex items-center gap-1 transition-colors"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 16v-4M12 8h.01" />
+                    </svg>
+                    Size Guide
+                  </button>
+                </div>
                 <p className="font-semibold mb-3">
                   Size: {selectedSize ? `UK ${selectedSize}` : "Not selected"}
                 </p>
@@ -366,6 +385,13 @@ export default function ProductDetail() {
         {/* Recently Viewed */}
         <RecentlyViewed currentProductId={product?.id} />
       </div>
+
+      {/* Size Guide Modal */}
+      <SizeGuideModal
+        isOpen={sizeGuideOpen}
+        onClose={() => setSizeGuideOpen(false)}
+        gender={product?.gender}
+      />
     </div>
   );
 }
