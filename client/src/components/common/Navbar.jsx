@@ -6,6 +6,7 @@ import { logout } from "../../store/authSlice";
 import { setCart, clearCart } from "../../store/cartSlice";
 import { setWishlist, clearWishlist } from "../../store/wishlistSlice";
 import { Menu, X, Search, Heart, ShoppingCart, User, LogOut } from "lucide-react";
+import SearchOverlay from "./SearchOverlay";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [brandsOpen, setBrandsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const brands = ["Nike", "Adidas", "Puma", "Reebok", "Skechers", "Woodland"];
 
@@ -111,7 +113,10 @@ export default function Navbar() {
         {/* Right Section */}
         <div className="flex items-center gap-4">
           {/* Search */}
-          <button className="text-ivory hover:text-gold transition-colors">
+          <button
+            className="text-ivory hover:text-gold transition-colors"
+            onClick={() => setSearchOpen(true)}
+          >
             <Search size={20} />
           </button>
 
@@ -271,6 +276,9 @@ export default function Navbar() {
           )}
         </div>
       )}
+
+      {/* Search Overlay */}
+      <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </nav>
   );
 }

@@ -35,6 +35,8 @@ export default function Products() {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
 
+  const searchQuery = searchParams.get("search") || "";
+
   useEffect(() => {
     setSelectedBrands(toList(searchParams.get("brand")));
     setSelectedCategories(toList(searchParams.get("category")));
@@ -66,7 +68,7 @@ export default function Products() {
   };
 
   const fetchProducts = async () => {
-    const useClientFiltering = selectedBrands.length > 1 || selectedCategories.length > 1;
+    const useClientFiltering = selectedBrands.length > 1 || selectedCategories.length > 1 || searchQuery;
 
     try {
       setLoading(true);
@@ -92,6 +94,17 @@ export default function Products() {
         nextProducts = nextProducts.filter((product) => selectedCategories.includes(product.category));
       }
 
+      // Apply search filter if query exists
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        nextProducts = nextProducts.filter(
+          (p) =>
+            p.name.toLowerCase().includes(q) ||
+            p.brand.toLowerCase().includes(q) ||
+            (p.tags && p.tags.toLowerCase().includes(q))
+        );
+      }
+
       const nextTotal = useClientFiltering ? nextProducts.length : res.data.data.total || nextProducts.length;
       setProducts(nextProducts);
       setTotal(nextTotal);
@@ -108,12 +121,12 @@ export default function Products() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [selectedBrands, selectedCategories, selectedGender, minPrice, maxPrice, sortBy, page]);
+  }, [selectedBrands, selectedCategories, selectedGender, minPrice, maxPrice, sortBy, page, searchQuery]);
 
   const pages = Math.ceil(total / 12);
-  const useLocalPagination = selectedBrands.length > 1 || selectedCategories.length > 1;
+  const useLocalPagination = selectedBrands.length > 1 || selectedCategories.length > 1 || searchQuery;
   const visibleProducts = useLocalPagination ? products.slice((page - 1) * 12, page * 12) : products;
-  const hasFilters = selectedBrands.length > 0 || selectedCategories.length > 0 || selectedGender || minPrice > 0 || maxPrice < MAX_PRICE;
+  const hasFilters = selectedBrands.length > 0 || selectedCategories.length > 0 || selectedGender || minPrice > 0 || maxPrice < MAX_PRICE || searchQuery;
 
   const handleAddToCart = (productId) => {
     dispatch(addToCart({ productId, quantity: 1 }));
@@ -129,6 +142,16 @@ export default function Products() {
     <div className="min-h-screen bg-obsidian text-ivory">
       <div className="max-w-7xl mx-auto px-6 py-8">
         <h1 className="font-display text-4xl text-ivory mb-8">Shop All Products</h1>
+
+        {searchQuery && (
+          <div className="mb-6">
+            <p className="text-ivory/60 text-sm">
+              Showing results for{" "}
+              <span className="text-ivory font-semibold">"{searchQuery}"</span>
+              {" — "}{total} products found
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="space-y-6">

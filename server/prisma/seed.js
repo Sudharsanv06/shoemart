@@ -1,7 +1,12 @@
 // server/prisma/seed.js
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
-const prisma = new PrismaClient();
+
+const prisma = new PrismaClient({
+  datasources: {
+    db: { url: process.env.DIRECT_URL },
+  },
+});
 
 async function main() {
   await prisma.orderItem.deleteMany({});

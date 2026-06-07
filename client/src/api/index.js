@@ -162,4 +162,8 @@ export const chatAPI = {
   send: (messages) => api.post("/chat", { messages }),
 };
 
+export const searchAPI = {
+  search: (q) => api.get(`/products/search?q=${encodeURIComponent(q)}`),
+};
+
 export default api;

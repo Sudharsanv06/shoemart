@@ -107,6 +107,10 @@ export default function Checkout() {
       toast.error("Enter a coupon code");
       return;
     }
+    if (!subtotal || subtotal <= 0) {
+      toast.error("Add items to cart first");
+      return;
+    }
 
     try {
       setCouponLoading(true);
@@ -285,11 +289,10 @@ export default function Checkout() {
                 {addresses.length > 0 && (
                   <div className="grid gap-4">
                     {addresses.map((address) => (
-                      <button
+                      <div
                         key={address.id}
-                        type="button"
                         onClick={() => setSelectedAddress(address.id)}
-                        className={`text-left border p-4 transition-colors ${
+                        className={`cursor-pointer text-left border p-4 transition-colors ${
                           selectedAddress === address.id
                             ? "border-gold bg-gold/5"
                             : "border-white/10 hover:border-gold/30"
@@ -306,18 +309,13 @@ export default function Checkout() {
                               </span>
                             )}
                           </div>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedAddress(address.id);
-                            }}
+                          <div
                             className={`text-sm font-semibold transition-colors ${
                               selectedAddress === address.id ? "text-gold" : "text-ivory/50 hover:text-gold"
                             }`}
                           >
                             {selectedAddress === address.id ? "✓ Selected" : "Select"}
-                          </button>
+                          </div>
                         </div>
                         <p className="font-semibold text-ivory">{address.fullName}</p>
                         <p className="text-ivory/70">{address.line1}</p>
@@ -326,7 +324,7 @@ export default function Checkout() {
                           {address.city}, {address.state} {address.pincode}
                         </p>
                         <p className="text-ivory/60 text-sm mt-1">Phone: {address.phone}</p>
-                      </button>
+                      </div>
                     ))}
                   </div>
                 )}
