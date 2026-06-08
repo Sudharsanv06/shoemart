@@ -1,70 +1,22 @@
-# 👟 SHOEMART — Premium Footwear E-Commerce
+# ?? SHOEMART � Premium Footwear E-Commerce
 
-Full-stack footwear store with customer shopping flows, Razorpay payments, and an admin panel.
+**SHOEMART** is a full-stack, premium footwear store featuring advanced customer shopping flows, Razorpay checkout, dynamic cart tracking, interactive chatbot integration, and complete admin dashboard management. 
 
-## Tech Stack
+For the complete architectural breakdown, codebase documentation, environmental needs, and feature setups, please view the main documentation file below:
 
-| Layer | Tech |
-|---|---|
-| Frontend | React 18, Vite, Tailwind CSS, Redux Toolkit |
-| Backend | Node.js, Express, Prisma ORM |
-| Database | PostgreSQL |
-| Payments | Razorpay |
-| Images | Cloudinary |
-| Auth | JWT |
+### ?? [View Full Project Overview](./PROJECT_OVERVIEW.md)
 
-## Features
-- Browse by brand, category, and gender
-- User auth with protected routes
-- Cart, wishlist, and checkout flow
-- Razorpay test-mode payments
-- Order history and status tracking
-- Admin product, order, and user management
+---
 
-## Quick Start
+## ? Quick Start
 
 ### Prerequisites
-Node.js 18+, PostgreSQL, Razorpay account, Cloudinary account
+Node.js 18+, PostgreSQL (or Supabase), Razorpay account, Cloudinary account.
 
-### Install
+### Local Setup
 ```bash
 git clone <repo-url> && cd shoemart
 cd client && npm install
 cd ../server && npm install
 ```
 
-### Configure environment
-```bash
-cp server/.env.example server/.env
-cp client/.env.example client/.env
-```
-
-### Database
-```bash
-cd server
-npx prisma@5.10.2 migrate dev --name init --schema prisma/schema.prisma
-npx prisma@5.10.2 generate --schema prisma/schema.prisma
-node prisma/seed.js
-```
-
-### Run
-```bash
-cd server && npm run dev
-cd client && npm run dev
-```
-
-## Test Credentials
-
-| Role | Email | Password |
-|---|---|---|
-| Admin | admin@shoemart.com | Admin@123 |
-| User | user@shoemart.com | User@123 |
-
-## Razorpay Test Payment
-Use the test card or UPI details from your Razorpay dashboard in test mode.
-
-## Project Structure
-
-shoemart/
-├── client/        React + Vite frontend
-└── server/        Express + Prisma backend
